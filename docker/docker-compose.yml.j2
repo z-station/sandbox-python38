@@ -1,0 +1,17 @@
+version: "3.3"
+
+services:
+
+  sandbox-python38-{{ env }}:
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+    container_name: sandbox-python38-{{ env }}
+    image: sandbox-python38-{{ env }}
+    volumes:
+      - ../src:/app/src
+    ports:
+      - "8001:80"
+    restart: on-failure
+    environment:
+      GUNICORN_WORKERS: {{ gunicorn_workers }}
