@@ -1,24 +1,24 @@
-from typing import TypedDict, List
+from typing import TypedDict, List, Union
 
 
 class ResponseDebugDict(TypedDict):
 
-    translator_output: str
-    translator_error: str
+    translator_console_output: str
+    translator_error_msg: str
 
 
 class ResponseTestData(TypedDict):
 
-    console_input: str
-    console_output: str
+    test_console_input: str
+    test_console_output: str
     translator_console_output: str
-    translator_console_error: str
-    success: bool
+    translator_error_msg: str
+    ok: Union[bool, None]
 
 
 class ResponseTestingDict(TypedDict):
 
     num: int
-    num_success: int
-    success: bool
+    num_ok: int
+    ok: bool
     tests_data: List[ResponseTestData]

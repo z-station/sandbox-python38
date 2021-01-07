@@ -1,25 +1,20 @@
 from typing import TypedDict, List
 
 
-class CheckersDict(TypedDict):
-
-    console_output: str
-
-
 class RequestDebugDict(TypedDict):
 
-    console_input: str
+    translator_console_input: str
     code: str
 
 
 class RequestTestData(TypedDict):
 
-    console_input: str
-    console_output: str
+    test_console_input: str
+    test_console_output: str
 
 
 class RequestTestingDict(TypedDict):
 
-    checkers: CheckersDict
-    tests: List[RequestTestData]
+    checker_code: str
+    tests_data: List[RequestTestData]
     code: str

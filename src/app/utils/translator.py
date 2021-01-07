@@ -1,5 +1,5 @@
 import re
-from typing import Tuple
+from typing import Tuple, Union
 from app.utils import msg
 
 
@@ -37,3 +37,16 @@ def process_translator_response(stdout: bytes, stderr: bytes) -> Tuple[str, str]
     output = '' if stdout is None else clear(stdout.decode())
     error = '' if stderr is None else clear(process_translator_error(stderr))
     return output, error
+
+
+def run_checker(checker_code: str, **checker_locals) -> Union[bool, None]:
+
+    """ Запускает код чекера на наборе переменных checker_locals
+        возвращает результат работы чекера """
+
+    try:
+        exec(checker_code, globals(), checker_locals)
+    except:
+        return None
+    else:
+        return checker_locals.get('result')
