@@ -11,7 +11,7 @@ services:
     volumes:
       - ../src:/app/src
     ports:
-      - "8001:80"
+      - "8001:8001"
     restart: on-failure
     environment:
       GUNICORN_WORKERS: {{ gunicorn_workers }}

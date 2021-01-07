@@ -1,3 +1,4 @@
+import subprocess
 from flask import Flask, request
 from app.entities.request import (
     RequestDebugDict,
@@ -9,13 +10,50 @@ from app.entities.response import (
     ResponseTestData,
     ResponseTestingDict
 )
+from app.utils.files import (
+    PyFile,
+    TestsFiles
+)
+from app.utils.translator import (
+    process_translator_response,
+    clear
+)
+from app import config
+from app.utils import msg
+
 app = Flask(__name__)
 
 
 @app.route('/debug', methods=['post'])
 def debug() -> ResponseDebugDict:
-    output = 'test output'
-    error = 'test error'
+    data: RequestDebugDict = request.json
+    console_input: str = clear(data.get('console_input', ''))
+    code: str = clear(data['code'])
+
+    file = PyFile(code)
+
+    try:
+        proc = subprocess.Popen(
+            args=['python', file.filepath],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        stdout, stderr = proc.communicate(
+            input=console_input.encode('utf-8'),
+            timeout=config.TIMEOUT
+        )
+        proc.kill()
+    except subprocess.TimeoutExpired:
+        output, error = '', msg.TIMEOUT
+    except Exception as e:
+        output, error = '', f'Неожиданное исключение: {e}'
+    else:
+        output, error = process_translator_response(
+            stdout=stdout,
+            stderr=stderr
+        )
+    file.remove()
     return ResponseDebugDict(
         translator_output=output,
         translator_error=error
