@@ -1,6 +1,7 @@
 import subprocess
 from typing import List
 from flask import Flask, request
+from flask_cors import CORS
 from app.entities.request import (
     RequestDebugDict,
     RequestTestData,
@@ -21,6 +22,7 @@ from app import config
 from app.utils import msg
 
 app = Flask(__name__)
+CORS(app, origins=config.CORS_DOMAINS)
 
 
 @app.route('/debug/', methods=['post'])
