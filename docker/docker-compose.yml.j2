@@ -9,9 +9,9 @@ services:
     container_name: sandbox-python38-{{ env }}
     image: sandbox-python38-{{ env }}
     volumes:
-      - ../src:/app/src
+      - ../src:/app/src:ro
     ports:
-      - "8001:8001"
+      - "{{ python38_public_port|default(8001) }}:8001"
     restart: on-failure
     environment:
-      GUNICORN_WORKERS: {{ gunicorn_workers }}
+      GUNICORN_WORKERS: {{ python38_gunicorn_workers|default(1) }}
