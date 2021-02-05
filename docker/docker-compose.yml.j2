@@ -11,7 +11,8 @@ services:
     volumes:
       - ../src:/app/src:ro
     ports:
-      - "{{ python38_public_port|default(8001) }}:8001"
+      - "{{ python38_public_port|default(9001) }}:9001"
     restart: on-failure
     environment:
       GUNICORN_WORKERS: {{ python38_gunicorn_workers|default(1) }}
+      CORS_DOMAINS: {{ python38_cors_domains }}
