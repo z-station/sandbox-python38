@@ -14,7 +14,8 @@ from app.service import PythonService
 
 
 app = Flask(__name__)
-CORS(app, origins=config.CORS_DOMAINS)
+# CORS(app, origins=config.CORS_DOMAINS)
+CORS(app)
 service = PythonService()
 
 
