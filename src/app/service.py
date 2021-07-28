@@ -1,3 +1,4 @@
+import os
 import subprocess
 from typing import Union, Optional, List
 
@@ -22,6 +23,13 @@ from app import config
 class PythonService:
 
     @staticmethod
+    def _preexec_fn():
+        def change_process_user():
+            os.setgid(config.SANDBOX_USER_UID)
+            os.setuid(config.SANDBOX_USER_UID)
+        return change_process_user()
+
+    @staticmethod
     def _clear(text: str) -> str:
 
         """ Удаляет из строки лишние спец. символы,
@@ -32,8 +40,8 @@ class PythonService:
         else:
             return text
 
-    @staticmethod
     def _run_code(
+        self,
         console_input: Optional[str],
         file: PythonFile
     ) -> RunResult:
@@ -48,6 +56,7 @@ class PythonService:
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            preexec_fn=self._preexec_fn,
             text=True
         )
         try:

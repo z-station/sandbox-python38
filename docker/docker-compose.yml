@@ -5,15 +5,19 @@ services:
   sandbox-python38:
     build:
       context: ..
+      args:
+        - SANDBOX_USER_UID=999
       dockerfile: ./docker/Dockerfile
     container_name: sandbox-python38
     image: sandbox-python38
     volumes:
-      - ../src:/app/src:ro
+      - ../src:/app/src
     ports:
       - "9001:9001"
     networks:
       - docker_localhost
+    environment:
+      - SANDBOX_USER_UID=999
     restart: on-failure
 
 networks:
