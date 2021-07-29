@@ -5,7 +5,7 @@ from typing import Optional
 from dataclasses import dataclass
 
 from app.utils import msg
-from app.config import TMP_DIR
+from app.config import SANDBOX_DIR
 
 
 class PythonFile:
@@ -13,7 +13,7 @@ class PythonFile:
     """ Описывает файлы, необходимые для запуска программы """
 
     def __init__(self, code: str):
-        self.filepath = os.path.join(TMP_DIR, f'{uuid.uuid4()}.py')
+        self.filepath = os.path.join(SANDBOX_DIR, f'{uuid.uuid4()}.py')
         with open(self.filepath, 'w') as file:
             file.write(code)
 
