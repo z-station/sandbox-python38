@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.8.12-buster
 
 ARG SANDBOX_USER_UID
 ARG SANDBOX_DIR
