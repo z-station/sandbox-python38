@@ -19,6 +19,6 @@ RUN adduser \
     chown root:root ${SANDBOX_DIR}
 
 COPY ./src/Pipfile ./src/Pipfile.lock /tmp/
-RUN cd /tmp && pipenv install --deploy --system
+RUN cd /tmp && pipenv install --deploy --dev --system
 
 WORKDIR ${SANDBOX_DIR}

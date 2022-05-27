@@ -11,7 +11,7 @@ from app import config
 from app.service import exceptions
 from app.service.entities import ExecuteResult
 from app.service import messages
-from app.utils import clean_str
+from app.utils import clean_str, clean_error
 
 
 class PythonService:
@@ -22,21 +22,6 @@ class PythonService:
             os.setgid(config.SANDBOX_USER_UID)
             os.setuid(config.SANDBOX_USER_UID)
         return change_process_user()
-
-    @classmethod
-    def _get_stdin(
-        cls,
-        code: str,
-        data_in: Optional[str] = None
-    ) -> str:
-
-        if data_in:
-            stdin = '$' + data_in.strip()
-            if stdin.find('\n') > 0:
-                stdin = stdin.replace('\n', '\n$')
-            return f'{stdin}\n{code.strip()}'
-        else:
-            return code.strip()
 
     @classmethod
     def _execute(
@@ -67,8 +52,8 @@ class PythonService:
             raise exceptions.ExecutionException(details=str(ex))
         else:
             return ExecuteResult(
-                result=clean_str(result) or None,
-                error=clean_str(error) or None
+                result=clean_str(result or None),
+                error=clean_error(error or None)
             )
         finally:
             proc.kill()

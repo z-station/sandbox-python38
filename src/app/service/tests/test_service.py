@@ -1,3 +1,4 @@
+# Тесты запускать только в контейнере!
 import pytest
 from unittest.mock import call
 from app.service.main import PythonService
@@ -115,6 +116,87 @@ def test_execute__timeout__raise_exception(mocker):
 
     # assert
     assert ex.value.message == messages.MSG_1
+    file.remove()
+
+
+def test_execute__deep_recursive__raise_exception(mocker):
+
+    # arrange
+    code = (
+        'def Fibonacci(n):\n'
+        '  if n<0:\n'
+        '    print("Incorrect input")\n'
+        '  elif n==1:\n'
+        '    return 0\n'
+        '  elif n==2:\n'
+        '    return 1\n'
+        '  else:\n'
+        '    return Fibonacci(n-1)+Fibonacci(n-2)\n'
+        'print(Fibonacci(50))'
+    )
+    file = PythonFile(code)
+    mocker.patch('app.config.TIMEOUT', 1)
+
+    # act
+    with pytest.raises(exceptions.TimeoutException) as ex:
+        PythonService._execute(file=file)
+
+    # assert
+    assert ex.value.message == messages.MSG_1
+    file.remove()
+
+
+def test_execute__write_access__error():
+
+    """ Тест работает только в контейнере
+        т.к. там ограничены права на запись в файловую систему """
+
+    # arrange
+    code = (
+        'with open("test.txt", "w") as file:\n'
+        '  file.write("test")'
+    )
+    file = PythonFile(code)
+
+    # act
+    exec_result = PythonService._execute(file=file)
+
+    # assert
+    assert 'Permission denied' in exec_result.error
+    assert exec_result.result is None
+    file.remove()
+
+
+def test_execute__clear_error_message__ok(mocker):
+
+    # arrange
+    code = "abnabra"
+    raw_error_message = (
+        "Traceback (most recent call last):\n"
+        "  File \"/sandbox/b7124ae0-2639-4372-a3b4-ed5752635499.py\", "
+        "line 1, in <module>\n"
+        "    abnabra\nNameError: name 'abnabra' is not defined"
+    )
+    clear_error_message = (
+        "Traceback (most recent call last):"
+        "line 1, in <module>\n"
+        "    abnabra\nNameError: name 'abnabra' is not defined"
+    )
+    file = PythonFile(code)
+    communicate_mock = mocker.patch(
+        'subprocess.Popen.communicate',
+        return_value=(None, raw_error_message)
+    )
+    # act
+    exec_result = PythonService._execute(file=file)
+
+    # assert
+    communicate_mock.assert_called_once_with(
+        input=None,
+        timeout=config.TIMEOUT
+    )
+    assert exec_result.result is None
+    assert exec_result.error == clear_error_message
     file.remove()
 
 
