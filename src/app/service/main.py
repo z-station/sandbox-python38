@@ -47,16 +47,15 @@ class PythonService:
                 timeout=config.TIMEOUT
             )
         except subprocess.TimeoutExpired:
-            raise exceptions.TimeoutException()
+            result, error = None, messages.MSG_1
         except Exception as ex:
             raise exceptions.ExecutionException(details=str(ex))
-        else:
-            return ExecuteResult(
-                result=clean_str(result or None),
-                error=clean_error(error or None)
-            )
         finally:
             proc.kill()
+        return ExecuteResult(
+            result=clean_str(result or None),
+            error=clean_error(error or None)
+        )
 
     @classmethod
     def _validate_checker_func(cls, checker_func: str):

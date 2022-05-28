@@ -1,3 +1,4 @@
+from typing import Union
 from flask import (
     Flask,
     request,
@@ -9,7 +10,8 @@ from app.service.main import PythonService
 from app.schema import (
     DebugSchema,
     TestsSchema,
-    BadRequestSchema
+    BadRequestSchema,
+    ServiceExceptionSchema
 )
 from app.service.exceptions import ServiceException
 
@@ -19,8 +21,12 @@ def create_app():
     app = Flask(__name__)
 
     @app.errorhandler(400)
-    def bad_request_handler(ex: Exception):
+    def bad_request_handler(ex: ValidationError):
         return BadRequestSchema().dump(ex), 400
+
+    @app.errorhandler(500)
+    def bad_request_handler(ex: ServiceException):
+        return ServiceExceptionSchema().dump(ex), 500
 
     @app.route('/', methods=['get'])
     def index():
@@ -33,8 +39,10 @@ def create_app():
             data = PythonService.debug(
                 schema.load(request.get_json())
             )
-        except (ServiceException, ValidationError) as ex:
+        except ValidationError as ex:
             abort(400, ex)
+        except ServiceException as ex:
+            abort(500, ex)
         else:
             return schema.dump(data)
 
@@ -45,8 +53,10 @@ def create_app():
             data = PythonService.testing(
                 schema.load(request.get_json())
             )
-        except (ServiceException, ValidationError) as ex:
+        except ValidationError as ex:
             abort(400, ex)
+        except ServiceException as ex:
+            abort(500, ex)
         else:
             return schema.dump(data)
     return app

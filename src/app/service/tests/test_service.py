@@ -100,7 +100,7 @@ def test_execute__empty_result__return_none():
     file.remove()
 
 
-def test_execute__timeout__raise_exception(mocker):
+def test_execute__timeout__return_error(mocker):
 
     # arrange
     code = (
@@ -111,15 +111,15 @@ def test_execute__timeout__raise_exception(mocker):
     mocker.patch('app.config.TIMEOUT', 1)
 
     # act
-    with pytest.raises(exceptions.TimeoutException) as ex:
-        PythonService._execute(file=file)
+    execute_result = PythonService._execute(file=file)
 
     # assert
-    assert ex.value.message == messages.MSG_1
+    assert execute_result.error == messages.MSG_1
+    assert execute_result.result is None
     file.remove()
 
 
-def test_execute__deep_recursive__raise_exception(mocker):
+def test_execute__deep_recursive__error(mocker):
 
     # arrange
     code = (
@@ -138,11 +138,11 @@ def test_execute__deep_recursive__raise_exception(mocker):
     mocker.patch('app.config.TIMEOUT', 1)
 
     # act
-    with pytest.raises(exceptions.TimeoutException) as ex:
-        PythonService._execute(file=file)
+    execute_result = PythonService._execute(file=file)
 
     # assert
-    assert ex.value.message == messages.MSG_1
+    assert execute_result.error == messages.MSG_1
+    assert execute_result.result is None
     file.remove()
 
 
