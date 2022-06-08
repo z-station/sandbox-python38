@@ -1,5 +1,5 @@
 from typing import Optional
-from marshmallow import Schema, ValidationError
+from marshmallow import Schema
 from marshmallow.fields import (
     Nested,
     Field,
@@ -17,7 +17,6 @@ from app.entities import (
     TestsData
 )
 from app.utils import clean_str
-from app.service.exceptions import ServiceException
 
 
 class StrField(Field):
